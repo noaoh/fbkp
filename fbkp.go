@@ -7,7 +7,11 @@ import (
 	"strings"
 )
 
-func BackupFile(name string, suffix string) error {
+func CreateBackupName(filename string, ext string) string {
+        return filename + "." + ext
+}
+
+func BackupFile(name string, ext string) error {
 	og_file, err := os.Open(name)
 	if err != nil {
 		return err
@@ -19,7 +23,7 @@ func BackupFile(name string, suffix string) error {
 		return err
 	}
 
-	bkp_name := name + "." + suffix
+	bkp_name := CreateBackupName(name, ext)
 	_, err = os.Create(bkp_name)
 	if err != nil {
 		return err
@@ -38,8 +42,8 @@ func BackupFile(name string, suffix string) error {
 	return err
 }
 
-func RestoreFile(name string, suffix string) error {
-	bkp_name := name + "." + suffix
+func RestoreFile(name string, ext string) error {
+	bkp_name := CreateBackupName(name, ext)
 	bkp_file, err := os.Open(bkp_name)
 	if err != nil {
 		return err
@@ -58,20 +62,20 @@ func RestoreFile(name string, suffix string) error {
 	return err
 }
 
-func RestoreDir(dir string, suffix string) error {
+func RestoreDir(dir string, ext string) error {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return err
 	}
 
-	real_suffix := "." + suffix
+	real_ext := "." + ext
 	for _, file := range files {
 		fname := file.Name()
 
-		if filepath.Ext(fname) == real_suffix {
-			restore_file := strings.TrimSuffix(fname, real_suffix)
+		if filepath.Ext(fname) == real_ext {
+			restore_file := strings.TrimSuffix(fname, real_ext)
 
-			err := RestoreFile(restore_file, suffix)
+			err := RestoreFile(restore_file, ext)
 			if err != nil {
 				return err
 			}

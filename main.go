@@ -20,7 +20,7 @@ func main() {
 	}
 
         for _, file := range flag.Args() {
-		bak_filename := file + "." + *ext
+		bak_filename := CreateBackupName(file, *ext)
 		if *restore {
 			err := RestoreFile(file, *ext)
 			if err != nil {
