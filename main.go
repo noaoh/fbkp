@@ -19,10 +19,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	for _, file := range flag.Args() {
-		bak_filename := CreateBackupName(file, *ext)
-		if *restore {
+	if *restore {
+		for _, file := range flag.Args() {
+			bak_filename := CreateBackupName(file, *ext)
 			err := RestoreFile(file, *ext)
+
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -31,8 +32,12 @@ func main() {
 			if *verbose {
 				fmt.Printf("%q -> %q\n", bak_filename, file)
 			}
-		} else {
+		}
+	} else {
+		for _, file := range flag.Args() {
+			bak_filename := CreateBackupName(file, *ext)
 			err := BackupFile(file, *ext)
+
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
