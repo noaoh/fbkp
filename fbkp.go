@@ -1,68 +1,57 @@
 package main
 
 import (
-	"io/ioutil"
+	"io"
+        "io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-func CreateBackupName(filename string, ext string) string {
-        return filename + "." + ext
+func CreateBackupName(filename, ext string) string {
+	return filename + "." + ext
 }
 
-func BackupFile(name string, ext string) error {
-	og_file, err := os.Open(name)
+func CopyFileContents(src, dst string) error {
+        in, err := os.Open(src)
+        if err != nil {
+                return err
+        }
+        defer in.Close()
+
+        out, err := os.Create(dst)
+        if err != nil {
+                return err
+        }
+        defer out.Close()
+
+        if _, err = io.Copy(out, in); err != nil {
+                return err
+        }
+
+        err = out.Sync()
+        return err
+}
+
+func BackupFile(name, ext string) error {
+        bkp_name := CreateBackupName(name, ext)
+        err := CopyFileContents(name, bkp_name)
 	if err != nil {
 		return err
 	}
-	defer og_file.Close()
+        return err
+}
 
-	buf, err := ioutil.ReadAll(og_file)
-	if err != nil {
-		return err
-	}
-
+func RestoreFile(name, ext string) error {
 	bkp_name := CreateBackupName(name, ext)
-	_, err = os.Create(bkp_name)
+        err := CopyFileContents(bkp_name, name)
 	if err != nil {
 		return err
 	}
-
-	err = os.Chmod(bkp_name, 0644)
-	if err != nil {
-		return err
-	}
-
-	err = ioutil.WriteFile(bkp_name, buf, 0755)
-	if err != nil {
-		return err
-	}
-
-	return err
+        return err
 }
 
-func RestoreFile(name string, ext string) error {
-	bkp_name := CreateBackupName(name, ext)
-	bkp_file, err := os.Open(bkp_name)
-	if err != nil {
-		return err
-	}
-	defer bkp_file.Close()
-
-	buf, err := ioutil.ReadAll(bkp_file)
-	if err != nil {
-		return err
-	}
-
-	err = ioutil.WriteFile(name, buf, 0755)
-	if err != nil {
-		return err
-	}
-	return err
-}
-
-func RestoreDir(dir string, ext string) error {
+func RestoreDir(dir, ext string) error {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return err
@@ -83,4 +72,3 @@ func RestoreDir(dir string, ext string) error {
 	}
 	return err
 }
-

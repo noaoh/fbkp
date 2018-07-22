@@ -19,7 +19,7 @@ func main() {
 		os.Exit(0)
 	}
 
-        for _, file := range flag.Args() {
+	for _, file := range flag.Args() {
 		bak_filename := CreateBackupName(file, *ext)
 		if *restore {
 			err := RestoreFile(file, *ext)
