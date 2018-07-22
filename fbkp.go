@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
         "io/ioutil"
 	"os"
 	"path/filepath"
@@ -19,17 +18,16 @@ func CopyFileContents(src, dst string) error {
         }
         defer in.Close()
 
-        out, err := os.Create(dst)
+        buf, err := ioutil.ReadAll(in)
         if err != nil {
                 return err
         }
-        defer out.Close()
 
-        if _, err = io.Copy(out, in); err != nil {
+        err = ioutil.WriteFile(dst, buf, 0755)
+        if err != nil {
                 return err
         }
 
-        err = out.Sync()
         return err
 }
 
