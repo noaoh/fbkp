@@ -99,7 +99,7 @@ func TestBackupFile(t *testing.T) {
 
 func TestRestoreFile(t *testing.T) {
 	for _, test := range testCases {
-		err := RestoreFile(test.real_filename, test.ext)
+		err := RestoreFile(test.backup_filename)
 		if err != nil {
 			t.Log(err)
 			t.Fail()

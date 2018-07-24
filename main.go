@@ -1,40 +1,28 @@
 package main
 
 import (
-	"flag"
+        "github.com/spf13/pflag"
 	"fmt"
+        "path/filepath"
 	"os"
 )
 
 func main() {
-	ext := flag.String("e", "bak", "The name of the backup extension")
-	restore := flag.Bool("r", false, "Restores the file from the backup if true, otherwise it backs the file up")
-	verbose := flag.Bool("v", false, "Verbosely prints output")
+	ext := pflag.StringP("ext", "e", "bak", "The name of the backup extension")
+        // recur := pflag.Bool("r", false, "Recursively backs up files in directories.")
+	backup := pflag.BoolP("backup", "b", false, "Backs up the file(s) if this flag is passed, otherwise it restores the file(s)")
+	verbose := pflag.BoolP("verbose", "v", false, "Verbosely prints output")
 
-	flag.Parse()
+	pflag.Parse()
 
-	if flag.NFlag() == 0 && flag.NArg() == 0 {
+	if pflag.NFlag() == 0 && pflag.NArg() == 0 {
 		fmt.Println("Usage of fbkp:")
-		flag.PrintDefaults()
+		pflag.PrintDefaults()
 		os.Exit(0)
 	}
 
-	if *restore {
-		for _, file := range flag.Args() {
-			bak_filename := CreateBackupName(file, *ext)
-			err := RestoreFile(file, *ext)
-
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-
-			if *verbose {
-				fmt.Printf("%q -> %q\n", bak_filename, file)
-			}
-		}
-	} else {
-		for _, file := range flag.Args() {
+	if *backup {
+		for _, file := range pflag.Args() {
 			bak_filename := CreateBackupName(file, *ext)
 			err := BackupFile(file, *ext)
 
@@ -47,5 +35,23 @@ func main() {
 				fmt.Printf("%q -> %q\n", file, bak_filename)
 			}
 		}
-	}
+	} else {
+                real_ext := "." + *ext
+		for _, file := range pflag.Args() {
+                        if filepath.Ext(file) == real_ext {
+                                og_filename := CreateOriginalName(file)
+                                err := RestoreFile(file)
+
+                                if err != nil {
+                                        fmt.Println(err)
+                                        os.Exit(1)
+                                }
+
+                                if *verbose {
+                                        fmt.Printf("%q -> %q\n", file, og_filename)
+                                }
+                        }
+
+		}
+        }
 }

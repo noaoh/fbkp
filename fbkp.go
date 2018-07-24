@@ -11,6 +11,10 @@ func CreateBackupName(filename, ext string) string {
 	return filename + "." + ext
 }
 
+func CreateOriginalName(filename string) string {
+        return strings.TrimSuffix(filename, filepath.Ext(filename))
+}
+
 func CopyFileContents(src, dst string) error {
 	in, err := os.Open(src)
 	if err != nil {
@@ -40,9 +44,9 @@ func BackupFile(name, ext string) error {
 	return err
 }
 
-func RestoreFile(name, ext string) error {
-	bkp_name := CreateBackupName(name, ext)
-	err := CopyFileContents(bkp_name, name)
+func RestoreFile(name string) error {
+	og_name := CreateOriginalName(name)
+	err := CopyFileContents(name, og_name)
 	if err != nil {
 		return err
 	}
@@ -60,9 +64,7 @@ func RestoreDir(dir, ext string) error {
 		fname := file.Name()
 
 		if filepath.Ext(fname) == real_ext {
-			restore_file := strings.TrimSuffix(fname, real_ext)
-
-			err := RestoreFile(restore_file, ext)
+			err := RestoreFile(fname)
 			if err != nil {
 				return err
 			}
