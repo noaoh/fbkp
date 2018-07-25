@@ -112,6 +112,27 @@ func TestRestoreFile(t *testing.T) {
 	}
 }
 
+func TestBackupDir(t *testing.T) {
+	dir := "./assets/test"
+	dir_prefix := "./assets/test/"
+	err := BackupDir(dir, "bak")
+	if err != nil {
+		t.Log(err)
+	}
+
+	test_files, _ := ioutil.ReadDir(dir)
+	for _, file := range test_files {
+		fname := dir_prefix + file.Name()
+		if filepath.Ext(fname) == ".txt" {
+			bkp_file := CreateBackupName(fname, "bak")
+			if !EqualFiles(fname, bkp_file) {
+                                t.Logf("Backup file %q is not equivalent to %q", bkp_file, fname)
+				t.Fail()
+			}
+		}
+	}
+}
+
 func TestRestoreDir(t *testing.T) {
 	dir := "./assets/test"
 	dir_prefix := "./assets/test/"
@@ -126,7 +147,7 @@ func TestRestoreDir(t *testing.T) {
 		if filepath.Ext(fname) == ".txt" {
 			bkp_file := CreateBackupName(fname, "bak")
 			if !EqualFiles(fname, bkp_file) {
-				t.Logf("%q != %q", fname, bkp_file)
+                                t.Logf("Restored file %q is not equivalent to %q", fname, bkp_file)
 				t.Fail()
 			}
 		}

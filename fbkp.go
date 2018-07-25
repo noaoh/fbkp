@@ -53,6 +53,26 @@ func RestoreFile(name string) error {
 	return err
 }
 
+func BackupDir(dir, ext string) error {
+        files, err := ioutil.ReadDir(dir)
+        if err != nil {
+                return err
+        }
+
+        real_ext := "." + ext
+        for _, file := range files {
+                fname := file.Name()
+
+                if filepath.Ext(fname) != real_ext {
+                        err := BackupFile(filepath.Join(dir, fname), ext)
+                        if err != nil {
+                                return err
+                        }
+                }
+        }
+        return err
+}
+
 func RestoreDir(dir, ext string) error {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -64,7 +84,7 @@ func RestoreDir(dir, ext string) error {
 		fname := file.Name()
 
 		if filepath.Ext(fname) == real_ext {
-			err := RestoreFile(fname)
+			err := RestoreFile(filepath.Join(dir, fname))
 			if err != nil {
 				return err
 			}
