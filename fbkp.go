@@ -2,7 +2,7 @@ package main
 
 import (
 	"io/ioutil"
-        "log"
+        "fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -52,7 +52,7 @@ func BackupFile(path, ext string) error {
         return err
 }
 
-func RestoreFile(path, ext string) error {
+func RestoreFile(path string) error {
         info, err := os.Stat(path)
         if !info.IsDir() {
                 og_path := CreateOriginalName(path)
@@ -68,8 +68,8 @@ func BackupDir(dir string, ext string, verbose bool, recursive bool) error {
         real_ext := "." + ext
         err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
                 if err != nil {
-                        log.Printf("skipping a directory without errors: %q\n", info.Name())
-                        log.Printf("prevent panic by handling failure accessing a path %q: %v\n", dir, err)
+                        fmt.Printf("skipping a directory without errors: %q\n", info.Name())
+                        fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", dir, err)
                         return err
                 }
 
@@ -80,7 +80,7 @@ func BackupDir(dir string, ext string, verbose bool, recursive bool) error {
                         if err != nil {
                                 return err
                         }
-                        log.Printf("%q -> %q\n", path, bkp_path)
+                        fmt.Printf("%q -> %q\n", path, bkp_path)
                 } else if !recursive && path != dir {
                         return filepath.SkipDir
                 }
@@ -93,7 +93,7 @@ func RestoreDir(dir string, ext string, verbose bool, recursive bool) error {
         real_ext := "." + ext
         err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
                 if err != nil {
-                        log.Printf("prevent panic by handling failure accessing a path %q: %v\n", dir, err)
+                        fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", dir, err)
                         return err
                 }
 
@@ -104,9 +104,9 @@ func RestoreDir(dir string, ext string, verbose bool, recursive bool) error {
                         if err != nil {
                                 return err
                         } 
-                        log.Printf("%q -> %q\n", path, og_path)
+                        fmt.Printf("%q -> %q\n", path, og_path)
                 } else if !recursive && path != dir {
-                        log.Printf("skipping a directory without errors: %q\n", info.Name())
+                        fmt.Printf("skipping a directory without errors: %q\n", info.Name())
                         return filepath.SkipDir
                 }
                 return err
@@ -114,10 +114,11 @@ func RestoreDir(dir string, ext string, verbose bool, recursive bool) error {
         return err
 }
 
-
+/*
 func main() {
-        log.Println("Backing up directories")
-        BackupDir("./assets", "bak", true, true)
-        log.Println("Restoring directories")
+        fmt.Println("Backing up directories")
+        BackupDir("./assets/test", "bak", true, false)
+        fmt.Println("Restoring directories")
         RestoreDir("./assets", "bak", true, true)
 }
+*/
