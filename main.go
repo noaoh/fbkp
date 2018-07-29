@@ -25,23 +25,25 @@ func main() {
                         info, err := os.Stat(path) 
 
                         if os.IsNotExist(err) {
-                                fmt.Printf("path does not exist: %q", path) 
+                                fmt.Printf("path does not exist: %q\n", path) 
                         }
                         
                         if info.IsDir() {
+                                fmt.Println("Potato")
                                 err := BackupDir(path, *ext, *verbose, *recur)
                                 if err != nil {
-                                        fmt.Printf("error: %q", err)
+                                        fmt.Printf("error: %q\n", err)
                                 }
                         } else {
-                                bak_path := CreateBackupName(path, *ext)
+                                bkp_path := CreateBackupName(path, *ext)
+
                                 err := BackupFile(path, *ext)
                                 if err != nil {
-                                        fmt.Printf("error: %q", err)
+                                        fmt.Printf("error: %q\n", err)
                                 }
 
                                 if *verbose {
-                                        fmt.Printf("%q -> %q", path, bak_path)
+                                        fmt.Printf("%q -> %q\n", path, bkp_path)
                                 }
                         }
                 }
@@ -49,23 +51,23 @@ func main() {
                 for _, path := range pflag.Args() {
                         info, err := os.Stat(path)
                         if os.IsNotExist(err) {
-                                fmt.Printf("path does not exist: %q", path) 
+                                fmt.Printf("path does not exist: %q\n", path) 
                         }
                         
                         if info.IsDir() {
                                 err := RestoreDir(path, *ext, *verbose, *recur)
                                 if err != nil {
-                                        fmt.Printf("error: %q", err)
+                                        fmt.Printf("error: %q\n", err)
                                 }
                         } else {
                                 orig_path := CreateOriginalName(path)
                                 err := RestoreFile(path)
                                 if err != nil {
-                                        fmt.Printf("error: %q", err)
+                                        fmt.Printf("error: %q\n", err)
                                 }
 
                                 if *verbose {
-                                        fmt.Printf("%q -> %q", path, orig_path)
+                                        fmt.Printf("%q -> %q\n", path, orig_path)
                                 }
                         }
                 }
