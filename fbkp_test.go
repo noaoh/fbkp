@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"io/ioutil"
-	"log"
-	"os"
+	"log" 
+        "os"
 	"path/filepath"
 	"testing"
 )
@@ -154,11 +154,89 @@ func TestRestoreDir(t *testing.T) {
 	}
 }
 
+func BenchmarkBackupFile(b *testing.B) {
+	for _, test := range testCases {
+		err := BackupFile(test.real_filename, test.ext)
+		if err != nil {
+			b.Log(err)
+			b.Fail()
+		}
+
+		if !EqualFiles(test.real_filename, test.backup_filename) {
+			b.Logf("Backup file %q is not equivalent to %q", test.backup_filename, test.real_filename)
+			b.Fail()
+		}
+	}
+}
+
+func BenchmarkRestoreFile(b *testing.B) {
+	for _, test := range testCases {
+		err := RestoreFile(test.backup_filename)
+		if err != nil {
+			b.Log(err)
+			b.Fail()
+		}
+
+		if !EqualFiles(test.real_filename, test.backup_filename) {
+			b.Logf("Restored file %q is not equivalent to %q", test.real_filename, test.backup_filename)
+			b.Fail()
+		}
+	}
+}
+
+func BenchmarkBackupDir(b *testing.B) {
+	dir := "./assets/bench"
+	dir_prefix := "./assets/bench/"
+	err := BackupDir(dir, "bak", false, false)
+	if err != nil {
+		b.Log(err)
+	}
+
+	bench_files, _ := ioutil.ReadDir(dir)
+	for _, file := range bench_files {
+		fname := dir_prefix + file.Name()
+		if filepath.Ext(fname) == ".txt" {
+			bkp_file := CreateBackupName(fname, "bak")
+			if !EqualFiles(fname, bkp_file) {
+                                b.Logf("Backup file %q is not equivalent to %q\n", bkp_file, fname)
+				b.Fail()
+			}
+		}
+	}
+}
+
+func BenchmarkRestoreDir(b *testing.B) {
+	dir := "./assets/bench"
+	dir_prefix := "./assets/bench/"
+	err := RestoreDir(dir, "bak", false, false)
+	if err != nil {
+		b.Log(err)
+	}
+
+	bench_files, _ := ioutil.ReadDir(dir)
+	for _, file := range bench_files {
+		fname := dir_prefix + file.Name()
+		if filepath.Ext(fname) == ".txt" {
+			bkp_file := CreateBackupName(fname, "bak")
+			if !EqualFiles(fname, bkp_file) {
+                                b.Logf("Restored file %q is not equivalent to %q\n", fname, bkp_file)
+				b.Fail()
+			}
+		}
+	}
+}
+
 func TestMain(m *testing.M) {
 	runTests := m.Run()
 
         for _, file := range testCases {
                 os.Remove(file.backup_filename)
         }
+
+        for _, file := range benchCases {
+                os.Remove(file.real_filename)
+                os.Remove(file.backup_filename)
+        }
+
 	os.Exit(runTests)
 }
