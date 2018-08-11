@@ -8,14 +8,30 @@ import (
 	"strings"
 )
 
+// CreateBackupName takes a filename and an extension,
+// such as bak, and returns a filename with that
+// extension appended.
+// For example: CreateBackupName("test.txt", "bak")
+// will return "test.txt.bak"
 func CreateBackupName(filename, ext string) string {
 	return filename + "." + ext
 }
 
+// CreateOriginalName takes a filename and returns a
+// filename with the last extension removed.
+// For example: CreateOriginalName("test.txt.bak")
+// will return "test.txt"
 func CreateOriginalName(filename string) string {
         return strings.TrimSuffix(filename, filepath.Ext(filename))
 }
 
+// CopyFileContents takes a source filepath and a 
+// destination filepath, to copy the contents
+// and file permissions of the source filepath
+// to the destination filepath, creating the destination 
+// filepath if it does not exist.
+// For example, BackupFile("test.txt", "test.txt.bak") copies "test.txt"
+// to "test.txt.bak"
 func CopyFileContents(src, dst string) error {
 	in, err := os.Open(src)
 	if err != nil {
@@ -42,6 +58,12 @@ func CopyFileContents(src, dst string) error {
 	return err
 }
 
+// BackupFile takes a source filepath and an extension
+// and copies the contents and permissions of the source filepath
+// to a destination filepath which is the source filepath appended
+// with the extension.  BackupFile returns any error that occurred.
+// For example, BackupFile("test.txt", "bak") copies "test.txt"
+// to "test.txt.bak" 
 func BackupFile(path, ext string) error {
         info, err := os.Stat(path)
         if err != nil {
@@ -58,6 +80,11 @@ func BackupFile(path, ext string) error {
         return err
 }
 
+// RestoreFile takes a source filepath assuming it has a backup extension
+// (i.e. .bak), and copies the source filepath to a destination filepath
+// with that backup extension removed.  RestoreFile returns any error that occurred.
+// For example, RestoreFile("test.txt.bak") copies "test.txt.bak"
+// to "test.txt".
 func RestoreFile(path string) error {
         info, err := os.Stat(path)
         if !info.IsDir() {
@@ -70,6 +97,11 @@ func RestoreFile(path string) error {
 	return err
 }
 
+// BackupDir takes a directory, an extension, a verbose flag, and a recursive
+// flag.  BackupDir backs up the dir, ignoring files ending with the
+// ext string, verbosely showing the copying if verbose is set to True, and 
+// backing up directories in that dir if recursive is set to True.  BackupDir 
+// returns any error that occurred.
 func BackupDir(dir string, ext string, verbose bool, recursive bool) error {
         real_ext := "." + ext
         err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
@@ -86,7 +118,10 @@ func BackupDir(dir string, ext string, verbose bool, recursive bool) error {
                         if err != nil {
                                 return err
                         }
+
+                        if verbose {
                         fmt.Printf("%q -> %q\n", path, bkp_path)
+                        }
                 } else if !recursive && path != dir {
                         return filepath.SkipDir
                 }
@@ -95,6 +130,11 @@ func BackupDir(dir string, ext string, verbose bool, recursive bool) error {
         return err
 }
 
+// RestoreDir takes a directory, an extension, a verbose flag, and a recursive
+// flag.  RestoreDir restores the dir from files ending with the ext string,
+// verbosely showing the copying if verbose is set to True, and restoring 
+// directories in that dir if recursive is set to True.  RestoreDir returns any
+// error that occurred.
 func RestoreDir(dir string, ext string, verbose bool, recursive bool) error {
         real_ext := "." + ext
         err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
@@ -110,7 +150,10 @@ func RestoreDir(dir string, ext string, verbose bool, recursive bool) error {
                         if err != nil {
                                 return err
                         } 
+
+                        if verbose {
                         fmt.Printf("%q -> %q\n", path, og_path)
+                        }
                 } else if !recursive && path != dir {
                         fmt.Printf("skipping a directory without errors: %q\n", info.Name())
                         return filepath.SkipDir
