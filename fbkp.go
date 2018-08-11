@@ -23,12 +23,18 @@ func CopyFileContents(src, dst string) error {
 	}
 	defer in.Close()
 
+        info, err := os.Stat(src)
+	if err != nil {
+		return err
+	}
+
 	buf, err := ioutil.ReadAll(in)
 	if err != nil {
 		return err
 	}
 
-	err = ioutil.WriteFile(dst, buf, 0755)
+        permissions := info.Mode().Perm()
+	err = ioutil.WriteFile(dst, buf, permissions)
 	if err != nil {
 		return err
 	}
