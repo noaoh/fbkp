@@ -6,7 +6,7 @@ go:
 
 install:
         - go get github.com/spf13/pflag
-
+        - go get github.com/kenshaw/cznic-ql/common/file
  
 script:
         - go test  -v ./...
