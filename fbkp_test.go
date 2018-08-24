@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"io/ioutil"
-	"log" 
-        "os"
+	"log"
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -126,7 +126,7 @@ func TestBackupDir(t *testing.T) {
 		if filepath.Ext(fname) == ".txt" {
 			bkp_file := CreateBackupName(fname, "bak")
 			if !EqualFiles(fname, bkp_file) {
-                                t.Logf("Backup file %q is not equivalent to %q\n", bkp_file, fname)
+				t.Logf("Backup file %q is not equivalent to %q\n", bkp_file, fname)
 				t.Fail()
 			}
 		}
@@ -147,7 +147,7 @@ func TestRestoreDir(t *testing.T) {
 		if filepath.Ext(fname) == ".txt" {
 			bkp_file := CreateBackupName(fname, "bak")
 			if !EqualFiles(fname, bkp_file) {
-                                t.Logf("Restored file %q is not equivalent to %q\n", fname, bkp_file)
+				t.Logf("Restored file %q is not equivalent to %q\n", fname, bkp_file)
 				t.Fail()
 			}
 		}
@@ -198,7 +198,7 @@ func BenchmarkBackupDir(b *testing.B) {
 		if filepath.Ext(fname) == ".txt" {
 			bkp_file := CreateBackupName(fname, "bak")
 			if !EqualFiles(fname, bkp_file) {
-                                b.Logf("Backup file %q is not equivalent to %q\n", bkp_file, fname)
+				b.Logf("Backup file %q is not equivalent to %q\n", bkp_file, fname)
 				b.Fail()
 			}
 		}
@@ -219,7 +219,7 @@ func BenchmarkRestoreDir(b *testing.B) {
 		if filepath.Ext(fname) == ".txt" {
 			bkp_file := CreateBackupName(fname, "bak")
 			if !EqualFiles(fname, bkp_file) {
-                                b.Logf("Restored file %q is not equivalent to %q\n", fname, bkp_file)
+				b.Logf("Restored file %q is not equivalent to %q\n", fname, bkp_file)
 				b.Fail()
 			}
 		}
@@ -229,14 +229,14 @@ func BenchmarkRestoreDir(b *testing.B) {
 func TestMain(m *testing.M) {
 	runTests := m.Run()
 
-        for _, file := range testCases {
-                os.Remove(file.backup_filename)
-        }
+	for _, file := range testCases {
+		os.Remove(file.backup_filename)
+	}
 
-        for _, file := range benchCases {
-                os.Remove(file.real_filename)
-                os.Remove(file.backup_filename)
-        }
+	for _, file := range benchCases {
+		os.Remove(file.real_filename)
+		os.Remove(file.backup_filename)
+	}
 
 	os.Exit(runTests)
 }
