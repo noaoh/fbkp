@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-        "fbkp"
+        "github.com/noaoh/fbkp"
 	"github.com/spf13/pflag"
 )
 
@@ -46,14 +46,14 @@ func main() {
 			}
 
 			if info.IsDir() {
-				err := BackupDir(path, *ext, *verbose, *recur)
+				err := fbkp.BackupDir(path, *ext, *verbose, *recur)
 				if err != nil {
 					fmt.Print((&fbkpError{message: "Backup failed for directory", path: path, err: err}).Error())
 				}
 			} else {
-				bkp_path := CreateBackupName(path, *ext)
+				bkp_path := fbkp.CreateBackupName(path, *ext)
 
-				err := BackupFile(path, *ext)
+				err := fbkp.BackupFile(path, *ext)
 				if err != nil {
 					fmt.Print((&fbkpError{message: "Backup failed for file", path: path, err: err}).Error())
 				}
@@ -72,15 +72,15 @@ func main() {
 			}
 
 			if info.IsDir() {
-				err := RestoreDir(path, *ext, *verbose, *recur)
-				if err != nil {
-					fmt.Print((&fbkpError{message: "Restore failed for file", path: path, err: err}).Error())
-				}
-			} else {
-				orig_path := CreateOriginalName(path)
-				err := RestoreFile(path)
+				err := fbkp.RestoreDir(path, *ext, *verbose, *recur)
 				if err != nil {
 					fmt.Print((&fbkpError{message: "Restore failed for directory", path: path, err: err}).Error())
+				}
+			} else {
+				orig_path := fbkp.CreateOriginalName(path)
+				err := fbkp.RestoreFile(path)
+				if err != nil {
+					fmt.Print((&fbkpError{message: "Restore failed for file", path: path, err: err}).Error())
 				}
 
 				if *verbose && err == nil {
