@@ -36,6 +36,10 @@ tags
 
 
 ### https://raw.github.com/github/gitignore/967cd6479319efde70a6fa44fa1bfa02020f2357/Go.gitignore
+# src, pkg, and bin directories
+src
+bin
+pkg
 
 # Binaries for programs and plugins
 *.exe
@@ -135,4 +139,5 @@ tags
 # Persistent undo
 [._]*.un~
 
-
+#
+*.bak
