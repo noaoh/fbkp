@@ -1,4 +1,4 @@
-package fbkp 
+package fbkp
 
 import (
 	"fmt"
@@ -8,21 +8,33 @@ import (
 	"strings"
 )
 
-// CreateBackupName takes a filename and an extension,
-// such as bak, and returns a filename with that
+// CreateBackupPath takes a filepath and an extension,
+// such as bak, and returns a  filepath with that
 // extension appended.
-// For example: CreateBackupName("test.txt", "bak")
-// will return "test.txt.bak"
-func CreateBackupName(filename, ext string) string {
-	return filename + "." + ext
+// For example: CreateBackupPath("test.txt", "bak")
+// will return "/path/to/test.txt.bak"
+func CreateBackupPath(filename, ext string) (string, error) {
+	backup_name := filename + "." + ext
+	backup_path, err := filepath.Abs(backup_name)
+	if err != nil {
+		return "", err
+	} else {
+		return backup_path, nil
+	}
 }
 
-// CreateOriginalName takes a filename and returns a
-// filename with the last extension removed.
-// For example: CreateOriginalName("test.txt.bak")
-// will return "test.txt"
-func CreateOriginalName(filename string) string {
-	return strings.TrimSuffix(filename, filepath.Ext(filename))
+// CreateOriginalPath takes a filename and returns a
+// filepath with the last extension removed.
+// For example: CreateOriginalPath("test.txt.bak")
+// will return "/path/to/test.txt"
+func CreateOriginalPath(filename string) (string, error) {
+	original_name := strings.TrimSuffix(filename, filepath.Ext(filename))
+	original_path, err := filepath.Abs(original_name)
+	if err != nil {
+		return "", err
+	} else {
+		return original_path, nil
+	}
 }
 
 // CopyFileContents takes a source filepath and a
@@ -71,8 +83,12 @@ func BackupFile(path, ext string) error {
 	}
 
 	if !info.IsDir() {
-		bkp_path := CreateBackupName(path, ext)
-		err := CopyFileContents(path, bkp_path)
+		bkp_path, err := CreateBackupPath(path, ext)
+		if err != nil {
+			return err
+		}
+
+		err = CopyFileContents(path, bkp_path)
 		if err != nil {
 			return err
 		}
@@ -87,9 +103,17 @@ func BackupFile(path, ext string) error {
 // to "test.txt".
 func RestoreFile(path string) error {
 	info, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+
 	if !info.IsDir() {
-		og_path := CreateOriginalName(path)
-		err := CopyFileContents(path, og_path)
+		og_path, err := CreateOriginalPath(path)
+		if err != nil {
+			return err
+		}
+
+		err = CopyFileContents(path, og_path)
 		if err != nil {
 			return err
 		}
@@ -113,8 +137,12 @@ func BackupDir(dir string, ext string, verbose bool, recursive bool) error {
 
 		fname := info.Name()
 		if !info.IsDir() && filepath.Ext(fname) != real_ext {
-			bkp_path := CreateBackupName(path, ext)
-			err := CopyFileContents(path, bkp_path)
+			bkp_path, err := CreateBackupPath(path, ext)
+			if err != nil {
+				return err
+			}
+
+			err = CopyFileContents(path, bkp_path)
 			if err != nil {
 				return err
 			}
@@ -122,7 +150,8 @@ func BackupDir(dir string, ext string, verbose bool, recursive bool) error {
 			if verbose {
 				fmt.Printf("%q -> %q\n", path, bkp_path)
 			}
-		} else if !recursive && path != dir {
+		} else if info.IsDir() && !recursive {
+			fmt.Printf("skipping a directory without errors: %q\n", info.Name())
 			return filepath.SkipDir
 		}
 		return err
@@ -145,8 +174,12 @@ func RestoreDir(dir string, ext string, verbose bool, recursive bool) error {
 
 		fname := info.Name()
 		if !info.IsDir() && filepath.Ext(fname) == real_ext {
-			og_path := CreateOriginalName(path)
-			err := CopyFileContents(path, og_path)
+			og_path, err := CreateOriginalPath(path)
+			if err != nil {
+				return err
+			}
+
+			err = CopyFileContents(path, og_path)
 			if err != nil {
 				return err
 			}
@@ -154,11 +187,11 @@ func RestoreDir(dir string, ext string, verbose bool, recursive bool) error {
 			if verbose {
 				fmt.Printf("%q -> %q\n", path, og_path)
 			}
-		} else if !recursive && path != dir {
+		} else if info.IsDir() && !recursive {
 			fmt.Printf("skipping a directory without errors: %q\n", info.Name())
 			return filepath.SkipDir
 		}
-		return err
+		return nil
 	})
 	return err
 }

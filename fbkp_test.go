@@ -1,4 +1,4 @@
-package fbkp 
+package fbkp
 
 import (
 	"bufio"
@@ -33,7 +33,7 @@ func init() {
 	for _, test_file := range test_files {
 		fname := test_file.Name()
 		rname := TestEnv.dir_prefix + fname
-		bname := CreateBackupName(rname, TestEnv.ext)
+		bname, _ := CreateBackupPath(rname, TestEnv.ext)
 		bak_ext := TestEnv.ext
 
 		testCases = append(testCases, testCase{
@@ -48,7 +48,7 @@ func init() {
 	for _, bench_file := range bench_files {
 		fname := bench_file.Name()
 		rname := BenchEnv.dir_prefix + fname
-		bname := CreateBackupName(rname, BenchEnv.ext)
+		bname, _ := CreateBackupPath(rname, BenchEnv.ext)
 		bak_ext := BenchEnv.ext
 
 		benchCases = append(benchCases, testCase{
@@ -124,7 +124,7 @@ func TestBackupDir(t *testing.T) {
 	for _, file := range test_files {
 		fname := dir_prefix + file.Name()
 		if filepath.Ext(fname) == ".txt" {
-			bkp_file := CreateBackupName(fname, "bak")
+			bkp_file, _ := CreateBackupPath(fname, "bak")
 			if !EqualFiles(fname, bkp_file) {
 				t.Logf("Backup file %q is not equivalent to %q\n", bkp_file, fname)
 				t.Fail()
@@ -145,7 +145,7 @@ func TestRestoreDir(t *testing.T) {
 	for _, file := range test_files {
 		fname := dir_prefix + file.Name()
 		if filepath.Ext(fname) == ".txt" {
-			bkp_file := CreateBackupName(fname, "bak")
+			bkp_file, _ := CreateBackupPath(fname, "bak")
 			if !EqualFiles(fname, bkp_file) {
 				t.Logf("Restored file %q is not equivalent to %q\n", fname, bkp_file)
 				t.Fail()
@@ -196,7 +196,7 @@ func BenchmarkBackupDir(b *testing.B) {
 	for _, file := range bench_files {
 		fname := dir_prefix + file.Name()
 		if filepath.Ext(fname) == ".txt" {
-			bkp_file := CreateBackupName(fname, "bak")
+			bkp_file, _ := CreateBackupPath(fname, "bak")
 			if !EqualFiles(fname, bkp_file) {
 				b.Logf("Backup file %q is not equivalent to %q\n", bkp_file, fname)
 				b.Fail()
@@ -217,7 +217,7 @@ func BenchmarkRestoreDir(b *testing.B) {
 	for _, file := range bench_files {
 		fname := dir_prefix + file.Name()
 		if filepath.Ext(fname) == ".txt" {
-			bkp_file := CreateBackupName(fname, "bak")
+			bkp_file, _ := CreateBackupPath(fname, "bak")
 			if !EqualFiles(fname, bkp_file) {
 				b.Logf("Restored file %q is not equivalent to %q\n", fname, bkp_file)
 				b.Fail()
