@@ -115,7 +115,7 @@ func TestRestoreFile(t *testing.T) {
 func TestBackupDir(t *testing.T) {
 	dir := "./assets/test"
 	dir_prefix := "./assets/test/"
-	err := BackupDir(dir, "bak", false, false)
+	err := BackupDir(dir, "bak", false, true)
 	if err != nil {
 		t.Log(err)
 	}
@@ -136,7 +136,7 @@ func TestBackupDir(t *testing.T) {
 func TestRestoreDir(t *testing.T) {
 	dir := "./assets/test"
 	dir_prefix := "./assets/test/"
-	err := RestoreDir(dir, "bak", false, false)
+	err := RestoreDir(dir, "bak", false, true)
 	if err != nil {
 		t.Log(err)
 	}
