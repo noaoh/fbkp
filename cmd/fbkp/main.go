@@ -1,10 +1,10 @@
-package main 
+package main
 
 import (
 	"fmt"
 	"os"
 
-        "github.com/noaoh/fbkp"
+	"github.com/noaoh/fbkp"
 	"github.com/spf13/pflag"
 )
 
@@ -42,7 +42,7 @@ func main() {
 
 			if os.IsNotExist(err) {
 				fmt.Print((&fbkpError{message: "Path does not exist", path: path, err: nil}).Error())
-                                continue
+				continue
 			}
 
 			if info.IsDir() {
@@ -51,7 +51,7 @@ func main() {
 					fmt.Print((&fbkpError{message: "Backup failed for directory", path: path, err: err}).Error())
 				}
 			} else {
-                                bkp_path, err := fbkp.CreateBackupPath(path, *ext)
+				bkp_path, err := fbkp.CreateBackupPath(path, *ext)
 				if err != nil {
 					fmt.Print((&fbkpError{message: "Backup failed for file", path: path, err: err}).Error())
 				}
@@ -71,7 +71,7 @@ func main() {
 			info, err := os.Stat(path)
 			if os.IsNotExist(err) {
 				fmt.Print((&fbkpError{message: "Path does not exist", path: path, err: nil}).Error())
-                                continue
+				continue
 			}
 
 			if info.IsDir() {
