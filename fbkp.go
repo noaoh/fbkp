@@ -2,7 +2,7 @@ package fbkp
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -56,13 +56,13 @@ func CopyFileContents(src, dst string) error {
 		return err
 	}
 
-	buf, err := ioutil.ReadAll(in)
+	buf, err := io.ReadAll(in)
 	if err != nil {
 		return err
 	}
 
 	permissions := info.Mode().Perm()
-	err = ioutil.WriteFile(dst, buf, permissions)
+	err = os.WriteFile(dst, buf, permissions)
 	if err != nil {
 		return err
 	}
